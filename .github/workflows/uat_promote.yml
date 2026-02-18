@@ -1,0 +1,54 @@
+name: UAT Promotion Workflow
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 */14 * 4' # Every 2 weeks on Thursday at 9:00 AM UTC
+
+jobs:
+  uat-promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run end-to-end tests
+        run: npm run e2e
+
+      - name: Bake time (6 hours)
+        run: sleep 21600
+
+      - name: Create Pull Request to UAT
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: uat-promotion-${{ github.run_number }}
+          base: uat
+          title: "Promote DEV to UAT - Run #${{ github.run_number }}"
+          body: |
+            ## UAT Promotion
+
+            This PR promotes changes from DEV to UAT after successful:
+            - ✅ Unit tests
+            - ✅ E2E tests
+            - ✅ 6-hour bake time
+
+            **Requires 2 peer reviews before merging to UAT**
+          labels: promotion,uat
+          reviewers: |
+            reviewer1
+            reviewer2
