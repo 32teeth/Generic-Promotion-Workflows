@@ -39,7 +39,7 @@ By using this repository, teams can achieve faster, more reliable, and transpare
 - **Steps:**
   1. Checkout code.
   2. Validate branch name (must start with `feature-` or `issue-`).
-  3. Set up Node.js (version 16).
+  3. Set up Node.js (version 24).
   4. Install dependencies.
   5. Run tests.
   6. Notify reviewers.
@@ -51,7 +51,7 @@ By using this repository, teams can achieve faster, more reliable, and transpare
 - **Trigger:** When a pull request is merged into the `dev` branch.
 - **Steps:**
   1. Checkout code from the `dev` branch.
-  2. Set up Node.js (version 16).
+  2. Set up Node.js (version 24).
   3. Install dependencies.
   4. Run unit tests.
   5. Run end-to-end tests.
@@ -65,7 +65,7 @@ By using this repository, teams can achieve faster, more reliable, and transpare
 - **Trigger:** Automated every 2 weeks (bi-weekly on Thursday at 9:00 AM UTC) or manually via `workflow_dispatch`.
 - **Steps:**
   1. Checkout code from the `dev` branch.
-  2. Set up Node.js (version 16).
+  2. Set up Node.js (version 24).
   3. Install dependencies.
   4. Run unit tests.
   5. Run end-to-end tests.
@@ -79,7 +79,7 @@ By using this repository, teams can achieve faster, more reliable, and transpare
 - **Trigger:** When a pull request is merged into the `main` branch.
 - **Steps:**
   1. Checkout code.
-  2. Set up Node.js (version 16).
+  2. Set up Node.js (version 24).
   3. Start a 24-hour bake time.
   4. Deploy to production.
   5. Create a GitHub release.
@@ -99,7 +99,7 @@ By using this repository, teams can achieve faster, more reliable, and transpare
 
 ## Prerequisites
 
-- Node.js (version 16)
+- Node.js (version 24)
 - npm
 - GitHub repository with appropriate permissions for workflows
 
