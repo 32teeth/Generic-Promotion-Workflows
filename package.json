@@ -1,0 +1,30 @@
+{
+  "name": "generic-promotion-workflows",
+  "version": "0.0.0",
+  "author": "Eugene Yevhen Andruszczenko <eugene.andruszczenko@gmail.com>",
+  "contributors": [
+    "32teeth <eugene.andruszczenko@gmail.com> (https://github.com/32teeth)"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "echo \"Publishing package...\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreug/Generic-Promotion-Workflows.git"
+  },
+  "keywords": [
+    "github",
+    "actions",
+    "workflows",
+    "promotion",
+    "automation"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andreug/Generic-Promotion-Workflows/issues"
+  },
+  "homepage": "https://github.com/andreug/Generic-Promotion-Workflows#readme",
+  "dependencies": {}
+}

@@ -9,7 +9,7 @@ This repository provides a streamlined and automated approach to managing code p
    - Ensures that all necessary checks (e.g., tests, bake times) are performed before promoting code to the next environment.
 
 2. **Consistency Across Environments**:
-   - Standardizes the promotion process for `dev`, `uat`, and `prod` branches.
+   - Standardizes the promotion process for `dev`, `uat`, and `main` branches.
    - Enforces branch naming conventions and validation to maintain repository hygiene.
 
 3. **Quality Assurance**:

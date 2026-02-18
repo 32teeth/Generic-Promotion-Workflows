@@ -1,38 +1,104 @@
-name: Production Release Workflow
+name: Production Release
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: "Reset the branch (optional)"
+        required: false
+        default: ""
 
 jobs:
-  prod-release:
-    if: github.event.pull_request.merged == true
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: "24"
+          node-version: "16"
 
-      - name: Start bake time
-        run: echo "Bake time started. Waiting for 24 hours..."
+      - name: Install dependencies
+        run: npm install
 
-      - name: Deploy to production
-        run: echo "Deploying to production..."
+      - name: Bump version
+        id: bump_version
+        run: |
+          version=$(jq -r '.version' package.json)
+          IFS='.' read -r major minor patch <<< "$version"
 
-      - name: Create GitHub Release
+          if (( patch < 9 )); then
+            (( patch++ ))
+          elif (( minor < 9 )); then
+            (( minor++ ))
+            patch=0
+          else
+            (( major++ ))
+            minor=0
+            patch=0
+          fi
+
+          new_version="$major.$minor.$patch"
+
+          jq ".version = \"$new_version\"" package.json > temp.json && mv temp.json package.json
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
+      - name: Generate changelog
+        run: |
+          previous_version=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          changes="Changes in this version:"
+
+          if [ -n "$previous_version" ]; then
+            list=$(git log --pretty=format:"* %s" "$previous_version"..HEAD)
+          else
+            list=$(git log --pretty=format:"* %s")
+          fi
+
+          sed '1,2d' CHANGELOG.md > temp_changelog.mdx
+
+          cat <<EOF > CHANGELOG.md
+          # Changelog
+
+          ### $new_version
+
+          $changes
+
+          $list
+
+          $(cat temp_changelog.mdx)
+          EOF
+
+          rm temp_changelog.mdx
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json CHANGELOG.md
+          git commit -m "build: Bump version to $new_version"
+
+      - name: Create Git tag
+        run: |
+          git tag "$new_version" -m "build: $new_version"
+
+      - name: Push changes and tag
+        run: |
+          git push origin main
+          git push origin "$new_version"
+
+      - name: Create GitHub release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release v${{ github.run_number }}
+          tag_name: ${{ steps.bump_version.outputs.new_version }}
+          release_name: ${{ steps.bump_version.outputs.new_version }}
+          body: "Release ${{ steps.bump_version.outputs.new_version }}"
           draft: false
           prerelease: false
+
+      - name: Publish to npm
+        run: |
+          npm publish || exit 1
